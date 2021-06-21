@@ -64,14 +64,15 @@ export class SecretsCache {
           SecretId: SECRETS_NAME,
         })
         .promise()
-        .then(res => {
+        .then((res) => {
           const decoded = simpleDecode(res.SecretString, [].concat(DbSecrets.keys()));
           ttl = Number(decoded.TTL) || DEFAULT_TTL;
           this.state.ttl = ttl;
 
           return decoded;
         })
-                .catch(err => { //eslint-disable-line
+        .catch(() => {
+          //eslint-disable-line
           const envVars = [...DbSecrets.keys()];
           throw new Error(`Missing some required env variables \n\t${envVars.join(`\n\t`)}`);
         });
@@ -98,7 +99,7 @@ export class DbSecrets {
 
   // Returns `{ host: string, username: string, password: string, database: string }`;
   async get() {
-    const useEnv = DbSecrets.keys().every(key => !!process.env[key]);
+    const useEnv = DbSecrets.keys().every((key) => !!process.env[key]);
 
     const obj = useEnv ? process.env : await this.cache.get();
     return {
